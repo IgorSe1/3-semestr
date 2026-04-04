@@ -1,140 +1,157 @@
-class MyList {
+// MyList.java
+public class MyList {
     MyArray first;
     int size;
-    int blockSize = 5;
+    int blockSize;
 
-    MyList(){
+    MyList(int blockSize) throws InvalidCapacityException {
+        if (blockSize <= 0) {
+            throw new InvalidCapacityException("Невірна місткість");
+        }
+        this.blockSize = blockSize;
         first = new MyArray(blockSize);
         size = 0;
     }
 
-    public void add(int value){
+    public void add(int value) {
         MyArray cur = first;
-        while(cur.next != null){
+
+        while (cur.next != null) {
             cur = cur.next;
         }
-        if(cur.size == blockSize){
+
+        if (cur.size == blockSize) {
             MyArray n = new MyArray(blockSize);
             cur.next = n;
             n.prev = cur;
             cur = n;
         }
+
         cur.data[cur.size] = value;
         cur.size++;
         size++;
     }
 
-    public void addFirst(int value){
+    public void addFirst(int value) throws InvalidIndexException {
         add(0, value);
     }
 
-    public void add(int index, int value){
-        if(index < 0 || index > size) return;
+    public void add(int index, int value) throws InvalidIndexException {
+        if (index < 0 || index > size) {
+            throw new InvalidIndexException("Невірний індекс");
+        }
 
-        if(index == size){
+        if (index == size) {
             add(value);
             return;
         }
 
-        int i = 0;
+        int[] oldArr = toArray();
+        int[] newArr = new int[size + 1];
+
+        for (int i = 0; i < index; i++) {
+            newArr[i] = oldArr[i];
+        }
+
+        newArr[index] = value;
+
+        for (int i = index; i < size; i++) {
+            newArr[i + 1] = oldArr[i];
+        }
+
+        rebuild(newArr);
+    }
+
+    public int get(int index) throws InvalidIndexException, EmptyListException {
+        if (size == 0) {
+            throw new EmptyListException("Список порожній");
+        }
+
+        if (index < 0 || index >= size) {
+            throw new InvalidIndexException("Невірний індекс");
+        }
+
+        int k = 0;
         MyArray cur = first;
 
-        while(cur != null){
-            for(int j = 0; j < cur.size; j++){
-                if(i == index){
-                    shiftRight(cur, j);
-                    cur.data[j] = value;
-                    size++;
-                    return;
+        while (cur != null) {
+            for (int i = 0; i < cur.size; i++) {
+                if (k == index) {
+                    return cur.data[i];
                 }
-                i++;
+                k++;
             }
             cur = cur.next;
         }
+
+        throw new InvalidIndexException("Невірний індекс");
     }
 
-    private void shiftRight(MyArray block, int pos){
-        MyArray cur = block;
-
-        while(cur != null){
-            if(cur.size < blockSize){
-                for(int i = cur.size; i > 0; i--){
-                    cur.data[i] = cur.data[i-1];
-                }
-                cur.size++;
-                return;
-            }
-            if(cur.next == null){
-                MyArray n = new MyArray(blockSize);
-                cur.next = n;
-                n.prev = cur;
-            }
-            cur = cur.next;
+    public void remove(int index) throws InvalidIndexException, EmptyListException {
+        if (size == 0) {
+            throw new EmptyListException("Список порожній");
         }
-    }
 
-    public int get(int index){
-        if(index < 0 || index >= size) return -1;
+        if (index < 0 || index >= size) {
+            throw new InvalidIndexException("Невірний індекс");
+        }
 
-        int i = 0;
-        MyArray cur = first;
+        int[] oldArr = toArray();
+        int[] newArr = new int[size - 1];
+        int j = 0;
 
-        while(cur != null){
-            for(int j = 0; j < cur.size; j++){
-                if(i == index){
-                    return cur.data[j];
-                }
-                i++;
+        for (int i = 0; i < size; i++) {
+            if (i != index) {
+                newArr[j] = oldArr[i];
+                j++;
             }
-            cur = cur.next;
         }
-        return -1;
+
+        rebuild(newArr);
     }
 
-    public void remove(int index){
-        if(index < 0 || index >= size) return;
-
-        int i = 0;
-        MyArray cur = first;
-
-        while(cur != null){
-            for(int j = 0; j < cur.size; j++){
-                if(i == index){
-                    shiftLeft(cur, j);
-                    size--;
-                    return;
-                }
-                i++;
-            }
-            cur = cur.next;
-        }
-    }
-
-    private void shiftLeft(MyArray block, int pos){
-        MyArray cur = block;
-
-        for(int i = pos; i < cur.size - 1; i++){
-            cur.data[i] = cur.data[i+1];
-        }
-        cur.size--;
-    }
-
-    public int size(){
+    public int size() {
         return size;
     }
 
-    public int capacity(){
+    public int capacity() {
         int cap = 0;
         MyArray cur = first;
-        while(cur != null){
+
+        while (cur != null) {
             cap += blockSize;
             cur = cur.next;
         }
+
         return cap;
     }
 
-    public void clear(){
+    public void clear() {
         first = new MyArray(blockSize);
         size = 0;
+    }
+
+    private int[] toArray() {
+        int[] arr = new int[size];
+        int k = 0;
+        MyArray cur = first;
+
+        while (cur != null) {
+            for (int i = 0; i < cur.size; i++) {
+                arr[k] = cur.data[i];
+                k++;
+            }
+            cur = cur.next;
+        }
+
+        return arr;
+    }
+
+    private void rebuild(int[] arr) {
+        clear();
+
+        for (int i = 0; i < arr.length; i++) {
+            add(arr[i]);
+        }
     }
 }
