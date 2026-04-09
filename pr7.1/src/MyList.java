@@ -1,27 +1,26 @@
-// MyList.java
-public class MyList {
-    MyArray first;
+public class MyList<T> {
+    MyArray<T> first;
     int size;
     int blockSize;
 
-    MyList(int blockSize) throws InvalidCapacityException {
+    public MyList(int blockSize) throws InvalidCapacityException {
         if (blockSize <= 0) {
             throw new InvalidCapacityException("Невірна місткість");
         }
         this.blockSize = blockSize;
-        first = new MyArray(blockSize);
+        first = new MyArray<T>(blockSize);
         size = 0;
     }
 
-    public void add(int value) {
-        MyArray cur = first;
+    public void add(T value) {
+        MyArray<T> cur = first;
 
         while (cur.next != null) {
             cur = cur.next;
         }
 
         if (cur.size == blockSize) {
-            MyArray n = new MyArray(blockSize);
+            MyArray<T> n = new MyArray<T>(blockSize);
             cur.next = n;
             n.prev = cur;
             cur = n;
@@ -32,11 +31,11 @@ public class MyList {
         size++;
     }
 
-    public void addFirst(int value) throws InvalidIndexException {
+    public void addFirst(T value) throws InvalidIndexException {
         add(0, value);
     }
 
-    public void add(int index, int value) throws InvalidIndexException {
+    public void add(int index, T value) throws InvalidIndexException {
         if (index < 0 || index > size) {
             throw new InvalidIndexException("Невірний індекс");
         }
@@ -46,8 +45,8 @@ public class MyList {
             return;
         }
 
-        int[] oldArr = toArray();
-        int[] newArr = new int[size + 1];
+        Object[] oldArr = toArray();
+        Object[] newArr = new Object[size + 1];
 
         for (int i = 0; i < index; i++) {
             newArr[i] = oldArr[i];
@@ -62,7 +61,7 @@ public class MyList {
         rebuild(newArr);
     }
 
-    public int get(int index) throws InvalidIndexException, EmptyListException {
+    public T get(int index) throws InvalidIndexException, EmptyListException {
         if (size == 0) {
             throw new EmptyListException("Список порожній");
         }
@@ -72,7 +71,7 @@ public class MyList {
         }
 
         int k = 0;
-        MyArray cur = first;
+        MyArray<T> cur = first;
 
         while (cur != null) {
             for (int i = 0; i < cur.size; i++) {
@@ -96,8 +95,8 @@ public class MyList {
             throw new InvalidIndexException("Невірний індекс");
         }
 
-        int[] oldArr = toArray();
-        int[] newArr = new int[size - 1];
+        Object[] oldArr = toArray();
+        Object[] newArr = new Object[size - 1];
         int j = 0;
 
         for (int i = 0; i < size; i++) {
@@ -116,7 +115,7 @@ public class MyList {
 
     public int capacity() {
         int cap = 0;
-        MyArray cur = first;
+        MyArray<T> cur = first;
 
         while (cur != null) {
             cap += blockSize;
@@ -127,14 +126,14 @@ public class MyList {
     }
 
     public void clear() {
-        first = new MyArray(blockSize);
+        first = new MyArray<T>(blockSize);
         size = 0;
     }
 
-    private int[] toArray() {
-        int[] arr = new int[size];
+    private Object[] toArray() {
+        Object[] arr = new Object[size];
         int k = 0;
-        MyArray cur = first;
+        MyArray<T> cur = first;
 
         while (cur != null) {
             for (int i = 0; i < cur.size; i++) {
@@ -147,11 +146,11 @@ public class MyList {
         return arr;
     }
 
-    private void rebuild(int[] arr) {
+    private void rebuild(Object[] arr) {
         clear();
 
         for (int i = 0; i < arr.length; i++) {
-            add(arr[i]);
+            add((T) arr[i]);
         }
     }
 }

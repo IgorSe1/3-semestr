@@ -1,10 +1,9 @@
-// Main.java
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        MyList list = null;
+        MyList<Integer> list = null;
 
         while (true) {
             try {
@@ -20,7 +19,7 @@ public class Main {
                     throw new InvalidCapacityException("Невірна кількість елементів");
                 }
 
-                list = new MyList(5);
+                list = new MyList<Integer>(5);
 
                 for (int i = 0; i < n; i++) {
                     System.out.print("Введи елемент: ");

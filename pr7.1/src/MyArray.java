@@ -1,11 +1,11 @@
-public class MyArray {
-    int[] data;
+public class MyArray<T> {
+    T[] data;
     int size;
-    MyArray next;
-    MyArray prev;
+    MyArray<T> next;
+    MyArray<T> prev;
 
-    MyArray(int capacity) {
-        data = new int[capacity];
+    public MyArray(int capacity) {
+        data = (T[]) new Object[capacity];
         size = 0;
         next = null;
         prev = null;
